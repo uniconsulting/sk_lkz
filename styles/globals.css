@@ -3,10 +3,118 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light dark;
+  /* palette (RGB only) */
+  --bg: 255 255 255;
+  --primary: 122 114 233;
+  --secondary1: 156 175 136;
+  --secondary2: 198 207 19;
+  --ink: 38 41 46;
+
+  /* glass tokens */
+  --glass-blur: 16px;
+  --glass-border-alpha: 0.10;
+  --glass-tint-primary: rgb(var(--primary) / 0.08);
+  --glass-tint-secondary1: rgb(var(--secondary1) / 0.08);
+  --glass-tint-secondary2: rgb(var(--secondary2) / 0.06);
+  --glass-tint-none: rgb(var(--bg) / 0.08);
+
+  /* radius tokens */
+  --r-card: 22px;
+  --r-block: 30px;
+  --r-sm: 14px;
+
+  /* shadows (no black, only ink) */
+  --shadow-glass: 0 1px 1px rgb(var(--ink) / 0.06),
+                  0 12px 28px rgb(var(--ink) / 0.08);
+  --shadow-glass-hover: 0 2px 2px rgb(var(--ink) / 0.07),
+                        0 18px 40px rgb(var(--ink) / 0.10);
+
+  /* motion */
+  --dur-hover: 140ms;
+  --dur-panel: 380ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-body {
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+@layer base {
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  body {
+    background: rgb(var(--bg));
+    color: rgb(var(--ink));
+    font-family: var(--font-garet), sans-serif;
+    overflow-x: hidden;
+    position: relative;
+    isolation: isolate;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -20vh -20vw;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(44vmax 44vmax at 18% 12%, rgb(var(--primary) / 0.10), transparent 60%),
+      radial-gradient(42vmax 42vmax at 78% 18%, rgb(var(--secondary2) / 0.08), transparent 62%),
+      radial-gradient(48vmax 48vmax at 72% 78%, rgb(var(--secondary1) / 0.10), transparent 64%);
+    filter: blur(10px);
+  }
+
+  ::selection {
+    background: rgb(var(--primary) / 0.18);
+    color: rgb(var(--ink));
+  }
+}
+
+@layer components {
+  .glass {
+    position: relative;
+    background: rgb(var(--bg) / 0.72);
+    border: 1px solid rgb(var(--ink) / var(--glass-border-alpha));
+    box-shadow: var(--shadow-glass);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    transition:
+      transform var(--dur-hover) var(--ease-out),
+      box-shadow var(--dur-hover) var(--ease-out);
+  }
+
+  .glass:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-glass-hover);
+  }
+
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--glass-tint-none);
+    pointer-events: none;
+  }
+
+  .glass > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .glass-tint-primary::before {
+    background: var(--glass-tint-primary);
+  }
+  .glass-tint-secondary1::before {
+    background: var(--glass-tint-secondary1);
+  }
+  .glass-tint-secondary2::before {
+    background: var(--glass-tint-secondary2);
+  }
+}
+
+@layer utilities {
+  .backdrop-blur-glass {
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+  }
 }
